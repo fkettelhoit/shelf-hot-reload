@@ -1,0 +1,15 @@
+name: shelf_hot_reload
+description: Middleware for the shelf web server to allow html hot reload on file changes.
+version: 0.1.0
+homepage: https://github.com/fkettelhoit/shelf-hot-reload
+author: Frederic Kettelhoit <kettelhoit@gmail.com>
+
+environment:
+  sdk: '>=2.7.0 <3.0.0'
+
+dependencies:
+  vm_service_lib: ^3.14.2
+
+dev_dependencies:
+  effective_dart: ^1.1.0
+  test: ^1.6.0

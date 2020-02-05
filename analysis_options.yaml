@@ -1,0 +1,38 @@
+include: package:effective_dart/analysis_options.yaml
+
+linter:
+  rules:
+    - avoid_empty_else
+    - avoid_slow_async_io
+    - avoid_types_as_parameter_names
+    - no_duplicate_case_values
+    - unrelated_type_equality_checks
+    - always_declare_return_types
+    - avoid_shadowing_type_parameters
+    - camel_case_extensions
+    - empty_catches
+    - lines_longer_than_80_chars
+    - null_closures
+    - prefer_conditional_assignment
+    - prefer_contains
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - prefer_for_elements_to_map_fromIterable
+    - prefer_foreach
+    - prefer_if_elements_to_conditional_expressions
+    - prefer_if_null_operators
+    - prefer_is_empty
+    - prefer_null_aware_operators
+    - prefer_single_quotes
+    - prefer_spread_collections
+    - recursive_getters
+    - unawaited_futures
+    - unnecessary_null_in_if_null_operators
+    - use_function_type_syntax_for_parameters
+    - use_string_buffers
+    - sort_pub_dependencies
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
