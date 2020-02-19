@@ -14,3 +14,15 @@ it should be enough to start the Dart process with the arguments
 The reload of the pages served by the middleware based on these change events
 is done using an injected JS snippet that listens to a web socket and then
 calls `window.location.reload()`.
+
+Since hot reload needs to reload the page, only `GET` requests are injected
+with the hot reload functionality. To make sure that hot reload works properly
+after `POST` requests, make sure to follow a
+[Post/Redirect/Get](https://en.wikipedia.org/wiki/Post/Redirect/Get) pattern,
+for example by returning a `303` response pointing to the same url, just with
+a `GET`:
+
+```dart
+final redirected = request.url.replace(path: '/${request.url.path}');
+return Response.seeOther(redirected);
+```
