@@ -1,5 +1,5 @@
 Hot reload for the shelf web server
-------------------------------------
+===================================
 
 This library watches a directory (by default your working directory) for
 changes, reloads all the Dart sources of the running isolate and then reloads
