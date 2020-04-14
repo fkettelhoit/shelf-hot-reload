@@ -9,6 +9,12 @@ import 'html_reload.dart';
 /// JS snippet that calls `window.location.reload()`.
 /// Assumes a running Dart VM service (debug mode) at [host] : [port].
 Middleware hotReload(
-        {String directory = '', String host = 'localhost', int port = 8181}) =>
-    hotReloadOnEvent(
-        reloadSourcesOnChanges(directory: directory, host: host, port: port));
+        {String directory = '',
+        String host = 'localhost',
+        int port = 8181,
+        OnWatchEventFn onWatchEvent}) =>
+    hotReloadOnEvent(reloadSourcesOnChanges(
+        directory: directory,
+        host: host,
+        port: port,
+        onWatchEvent: onWatchEvent));

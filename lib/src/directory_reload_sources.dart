@@ -3,16 +3,26 @@ import 'package:vm_service_lib/vm_service_lib.dart' show Log;
 import 'package:vm_service_lib/vm_service_lib_io.dart' show vmServiceConnect;
 import 'package:watcher/watcher.dart' show DirectoryWatcher, WatchEvent;
 
+typedef OnWatchEventFn = Future<void> Function(String path);
+
 /// Uses the Dart VM's `reloadSources` feature to reload all sources of the
 /// running isolate whenever [directory] changes. Assumes a running Dart VM
 /// service at [host] with [port].
 Stream<WatchEvent> reloadSourcesOnChanges(
-    {String directory = '', String host = 'localhost', int port = 8181}) {
+    {String directory = '',
+    String host = 'localhost',
+    int port = 8181,
+    OnWatchEventFn onWatchEvent}) {
   final dir = path.absolute(directory);
   print('Watching $dir for hot reload');
   final w = DirectoryWatcher(dir);
+  w.events.handleError((dynamic e) {
+    print('error in stream: $e');
+  });
   return w.events.asyncMap((event) async {
+    print('${event.path} has changed, reloading sources...');
     await _reloadSources(host, port);
+    if (onWatchEvent != null) await onWatchEvent(event.path);
     return event;
   });
 }
