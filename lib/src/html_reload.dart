@@ -13,15 +13,6 @@ Middleware hotReloadOnEvent(Stream broadcast) => (innerHandler) {
       return (request) => _wrap(broadcast, innerHandler, request);
     };
 
-Handler _wsHandler(Stream broadcast) =>
-    webSocketHandler((WebSocketChannel webSocket) {
-      final subscription = broadcast.listen((dynamic message) async {
-        webSocket.sink.add('ping');
-      });
-      webSocket.stream
-          .listen((dynamic message) async {}, onDone: subscription.cancel);
-    });
-
 Future<Response> _wrap(
     Stream broadcast, Handler innerHandler, Request request) async {
   if (request.headers.containsKey('Upgrade') &&
@@ -30,6 +21,27 @@ Future<Response> _wrap(
   }
   return _injectListener(innerHandler, request);
 }
+
+Handler _wsHandler(Stream broadcast) =>
+    // ignore: avoid_types_on_closure_parameters
+    webSocketHandler((WebSocketChannel webSocket) {
+      StreamSubscription keepAlive() =>
+          Stream.periodic(Duration(minutes: 10), (x) => x).listen((_) async {
+            print('Sending keep-alive ping at ${DateTime.now()}');
+            webSocket.sink.add('ping');
+          });
+      var keepAliveSubscription = keepAlive();
+      final subscription = broadcast.listen((dynamic message) async {
+        print('Sending ping over websocket...');
+        webSocket.sink.add('ping');
+        await keepAliveSubscription.cancel();
+        keepAliveSubscription = keepAlive();
+      });
+      webSocket.stream.listen((dynamic message) async {}, onDone: () {
+        keepAliveSubscription.cancel();
+        subscription.cancel();
+      });
+    });
 
 Future<Response> _injectListener(Handler innerHandler, Request request) async {
   if (request.method == 'GET') {
