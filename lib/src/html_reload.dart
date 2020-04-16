@@ -58,10 +58,27 @@ Future<Response> _injectListener(Handler innerHandler, Request request) async {
 
 String _websocketInjection(Uri websocketUri) => '''
 <script type="application/javascript">
-    const socket = new WebSocket('$websocketUri');
-    socket.addEventListener('message', function (event) {
-        socket.close();
-        window.location.reload();
-    });
+    var hotReloadSocket = null;
+    var initHotReloadSocket = function(shouldReload) {
+        console.log('Connecting to socket at $websocketUri');
+        hotReloadSocket = new WebSocket('$websocketUri');
+        hotReloadSocket.onmessage = function(event) {
+            if (event.data === 'ping') {
+                hotReloadSocket.close();
+                window.location.reload();
+            }
+        };
+        hotReloadSocket.onopen = function(event) {
+            if (shouldReload) {
+                window.location.reload();
+            }
+        };
+        hotReloadSocket.onclose = function(event) {
+            setTimeout(function() {
+                initHotReloadSocket(true);
+            }, 1000);
+        };
+    };
+    initHotReloadSocket(false);
 </script>
 ''';
