@@ -12,9 +12,11 @@ Middleware hotReload(
         {String directory = '',
         String host = 'localhost',
         int port = 8181,
+        Set<String> allowedFileEndings = const {},
         OnWatchEventFn onWatchEvent}) =>
     hotReloadOnEvent(reloadSourcesOnChanges(
         directory: directory,
         host: host,
         port: port,
+        allowedFileEndings: allowedFileEndings,
         onWatchEvent: onWatchEvent));

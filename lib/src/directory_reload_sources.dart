@@ -12,6 +12,7 @@ Stream<WatchEvent> reloadSourcesOnChanges(
     {String directory = '',
     String host = 'localhost',
     int port = 8181,
+    Set<String> allowedFileEndings = const {},
     OnWatchEventFn onWatchEvent}) {
   final dir = path.absolute(directory);
   print('Watching $dir for hot reload');
@@ -19,7 +20,12 @@ Stream<WatchEvent> reloadSourcesOnChanges(
   w.events.handleError((dynamic e) {
     print('error in stream: $e');
   });
-  return w.events.asyncMap((event) async {
+
+  return w.events
+      .where((e) =>
+          allowedFileEndings.isEmpty ||
+          allowedFileEndings.contains(e.path.split('.').last))
+      .asyncMap((event) async {
     print('${event.path} has changed, reloading sources...');
     await _reloadSources(host, port);
     if (onWatchEvent != null) await onWatchEvent(event.path);
