@@ -8,7 +8,10 @@ environment:
   sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
+  shelf: ^0.7.2
+  shelf_web_socket: ^0.2.2+4
   vm_service_lib: ^3.14.2
+  watcher: ^0.9.7+10
 
 dev_dependencies:
   effective_dart: ^1.1.0
