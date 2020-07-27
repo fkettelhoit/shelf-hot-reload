@@ -28,7 +28,8 @@ Stream<WatchEvent> reloadSourcesOnChanges(
   final changeEvents = events
       .where((e) =>
           allowedFileEndings.isEmpty ||
-          allowedFileEndings.contains(e.path.split('.').last))
+          allowedFileEndings.contains(e.path.split('.').last) ||
+          allowedFileEndings.contains('.${e.path.split('.').last}'))
       .asBroadcastStream();
 
   final reloadEvents = changeEvents.asyncMap((event) async {
