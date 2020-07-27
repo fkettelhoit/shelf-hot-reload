@@ -19,20 +19,29 @@ Stream<WatchEvent> reloadSourcesOnChanges(
   final dir = path.absolute(directory);
   print('Watching $dir for hot reload');
   final w = DirectoryWatcher(dir);
-  w.events.handleError((dynamic e) {
+  final events = w.events.asBroadcastStream();
+
+  events.handleError((dynamic e) {
     print('error in stream: $e');
   });
 
-  return w.events
+  final changeEvents = events
       .where((e) =>
           allowedFileEndings.isEmpty ||
           allowedFileEndings.contains(e.path.split('.').last))
-      .asyncMap((event) async {
+      .asBroadcastStream();
+
+  final reloadEvents = changeEvents.asyncMap((event) async {
     print('${event.path} has changed, reloading sources...');
     await _reloadSources(host, port);
     if (onWatchEvent != null) await onWatchEvent(event.path);
     return event;
-  });
+  }).asBroadcastStream();
+
+  // necessary to consume the stream
+  reloadEvents.listen((event) {});
+
+  return reloadEvents;
 }
 
 void _reloadSources(String host, int port) async {
