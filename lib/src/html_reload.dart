@@ -32,7 +32,6 @@ Handler _wsHandler(Stream broadcast) =>
           });
       var keepAliveSubscription = keepAlive();
       final subscription = broadcast.listen((dynamic message) async {
-        print('Sending ping over websocket...');
         webSocket.sink.add('ping');
         await keepAliveSubscription.cancel();
         keepAliveSubscription = keepAlive();
