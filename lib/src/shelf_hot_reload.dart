@@ -12,7 +12,7 @@ Middleware hotReload(
         {String directory = '',
         String host = 'localhost',
         int port = 8181,
-        Set<String> allowedFileEndings = const {},
+        Set<String> allowedFileEndings = const {'dart'},
         OnWatchEventFn onWatchEvent}) =>
     hotReloadOnEvent(reloadSourcesOnChanges(
         directory: directory,
