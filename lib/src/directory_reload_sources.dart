@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:path/path.dart' as path;
 import 'package:vm_service_lib/vm_service_lib.dart' show Log;
 import 'package:vm_service_lib/vm_service_lib_io.dart' show vmServiceConnect;
 import 'package:watcher/watcher.dart' show DirectoryWatcher, WatchEvent;
 
-typedef OnWatchEventFn = Future<void> Function(String path);
+typedef OnWatchEventFn = FutureOr<void> Function(String path);
 
 /// Uses the Dart VM's `reloadSources` feature to reload all sources of the
 /// running isolate whenever [directory] changes. Assumes a running Dart VM
