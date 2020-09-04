@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:vm_service_lib/vm_service_lib.dart' show Log;
@@ -46,23 +47,29 @@ Stream<WatchEvent> reloadSourcesOnChanges(
 }
 
 void _reloadSources(String host, int port) async {
-  final serviceClient = await vmServiceConnect(host, port, log: _StdoutLog());
-  final vm = await serviceClient.getVM();
-  final isolates = vm.isolates.map((isolate) => isolate.id);
-  for (final id in isolates) {
-    final report = await serviceClient.reloadSources(id);
-    if (report.success) {
-      final details = report.json['details'] as Map<String, dynamic>;
-      final loaded = details['loadedLibraryCount'] as int;
-      final total = details['finalLibraryCount'] as int;
-      print('Reloaded $loaded/$total libraries');
-    } else {
-      final notices = report.json['notices'] as List<dynamic>;
-      for (final notice in notices) {
-        final message = notice['message'] as String;
-        print(message);
+  try {
+    final serviceClient = await vmServiceConnect(host, port, log: _StdoutLog());
+    final vm = await serviceClient.getVM();
+    final isolates = vm.isolates.map((isolate) => isolate.id);
+    for (final id in isolates) {
+      final report = await serviceClient.reloadSources(id);
+      if (report.success) {
+        final details = report.json['details'] as Map<String, dynamic>;
+        final loaded = details['loadedLibraryCount'] as int;
+        final total = details['finalLibraryCount'] as int;
+        print('Reloaded $loaded/$total libraries');
+      } else {
+        final notices = report.json['notices'] as List<dynamic>;
+        for (final notice in notices) {
+          final message = notice['message'] as String;
+          print(message);
+        }
       }
     }
+  } on SocketException catch (e) {
+    stderr.writeln('Could not connect to VM Service: $e');
+    stderr.writeln('Make sure that your process is started with arguments'
+        ' --observe --disable-service-auth-codes');
   }
 }
 
